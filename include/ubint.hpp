@@ -21,7 +21,9 @@ namespace estd
         // int constructor
         ubint(unsigned long long n = 0);
         // string constructor
-        ubint(std::string s);
+        ubint(const std::string& s);
+        // const char * constructor
+        ubint(const char * s);
         // copy constructor
         ubint(const ubint &u);
 
@@ -125,7 +127,7 @@ namespace estd
         } while (n);
     }
 
-    ubint::ubint(std::string s)
+    ubint::ubint(const std::string& s)
     {
         digits = "";
         for (int i = s.size() - 1; i >= 0; i--)
@@ -139,12 +141,12 @@ namespace estd
         }
     }
 
+    ubint::ubint(const char * s) : ubint(std::string(s)) {}
+
     ubint::ubint(const ubint &u)
     {
         digits = u.digits;
     }
-
-
 
     std::ostream &operator<<(std::ostream &out, const ubint &a)
     {
@@ -468,7 +470,7 @@ namespace estd
 
         if (a < b)
         {
-            a = 0;
+            a = 0ULL;
             return a;
         }
 
@@ -529,7 +531,7 @@ namespace estd
 
         if (b == 1 || a == b)
         {
-            a = 0;
+            a = 0ULL;
             return a;
         }
 
@@ -569,7 +571,7 @@ namespace estd
 
     ubint &operator<<=(ubint &a, const ubint &b)
     {
-        for (ubint i = 0; i < b; i++)
+        for (ubint i = 0ULL; i < b; i++)
         {
             a += a;
         }
@@ -586,7 +588,7 @@ namespace estd
 
     ubint &operator>>=(ubint &a, const ubint &b)
     {
-        for (ubint i = 0; i < b; i++)
+        for (ubint i = 0ULL; i < b; i++)
         {
             int add = 0;
             for (int i = a.digits.size() - 1; i >= 0; i--)
@@ -653,7 +655,7 @@ namespace estd
                 --mid;
                 right = mid;
             }
-            mid = 0;
+            mid = 0ULL;
         }
 
         return v;
