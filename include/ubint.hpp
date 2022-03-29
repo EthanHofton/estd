@@ -86,22 +86,24 @@ namespace estd
 
         // bit shifts
         friend ubint operator<<(const ubint &, const ubint &);
+        friend ubint &operator<<=(ubint &, const ubint &);
         friend ubint operator>>(const ubint &, const ubint &);
+        friend ubint &operator>>=(ubint &, const ubint &);
     
         // exponent
         // raise to power and assign
         friend ubint &operator^=(ubint &, const ubint &);
         // raise to power
-        friend ubint operator^(ubint &, const ubint &);
+        friend ubint operator^(const ubint &, const ubint &);
 
         // square root
-        friend ubint sqrt(ubint &);
+        friend ubint sqrt(const ubint &);
 
         // min, max
         // return the min of a and b
-        friend ubint min(ubint &a, ubint &b);
+        friend ubint min(const ubint &a, const ubint &b);
         // return the max of a and b
-        friend ubint max(ubint &a, ubint &b);
+        friend ubint max(const ubint &a, const ubint &b);
 
         // read and write
         // witre to output stream
@@ -110,9 +112,9 @@ namespace estd
         friend std::istream &operator>>(std::istream &, ubint &);
 
         // return n!
-        friend ubint factorial(ubint &n);
+        friend ubint factorial(const ubint &n);
         // maps ubint x from range (a, b) to (c, d)
-        friend ubint map(ubint &x, ubint &a, ubint &b, ubint &c, ubint &d);
+        friend ubint map(const ubint &x, const ubint &a, const ubint &b, const ubint &c, const ubint &d);
     };
 
     ubint::ubint(unsigned long long n)
@@ -560,35 +562,47 @@ namespace estd
 
     ubint operator<<(const ubint &a, const ubint &b)
     {
-        ubint res = a;
+        ubint tmp = a;
+        tmp <<= b;
+        return tmp;
+    }
+
+    ubint &operator<<=(ubint &a, const ubint &b)
+    {
         for (ubint i = 0; i < b; i++)
         {
-            res += res;
+            a += a;
         }
 
-        return res;
+        return a;
     }
 
     ubint operator>>(const ubint &a, const ubint &b)
     {
-        ubint res = a;
+        ubint tmp = a;
+        tmp >>= b;
+        return tmp;
+    }
+
+    ubint &operator>>=(ubint &a, const ubint &b)
+    {
         for (ubint i = 0; i < b; i++)
         {
             int add = 0;
-            for (int i = res.digits.size() - 1; i >= 0; i--)
+            for (int i = a.digits.size() - 1; i >= 0; i--)
             {
-                int digit = (res.digits[i] >> 1) + add;
-                add = ((res.digits[i] & 1) * 5);
-                res.digits[i] = digit;
+                int digit = (a.digits[i] >> 1) + add;
+                add = ((a.digits[i] & 1) * 5);
+                a.digits[i] = digit;
             }
 
-            while(res.digits.size() > 1 && !res.digits.back())
+            while(a.digits.size() > 1 && !a.digits.back())
             {
-                res.digits.pop_back();
+                a.digits.pop_back();
             }
         }
 
-        return res;
+        return a;
     }
 
     ubint &operator^=(ubint &a, const ubint &b)
@@ -596,18 +610,78 @@ namespace estd
         ubint exp = b, base = a;
         a = 1;
 
-        while(!null(exp))
+        while (!null(exp))
         {
             if (exp[0] & 1)
             {
-                
+                a *= base;
             }
+
+            base *= base;
+            exp >>= 1;
         }
+
+        return a;
     }
 
-    ubint operator^(ubint &a, const ubint &b)
+    ubint operator^(const ubint &a, const ubint &b)
     {
+        ubint tmp = a;
+        tmp ^= b;
+        return tmp;
+    }
 
+    ubint sqrt(const ubint &a)
+    {
+        ubint left = 1, right = a, v = 1, mid, prod;
+        right >>= 1;
+
+        while(left <= right)
+        {
+            mid += left;
+            mid += right;
+            mid >>= 1;
+            prod = (mid * mid);
+            if (prod <= a)
+            {
+                v = mid;
+                ++mid;
+                left = mid;
+            } 
+            else
+            {
+                --mid;
+                right = mid;
+            }
+            mid = 0;
+        }
+
+        return v;
+    }
+
+    ubint min(const ubint &a, const ubint &b)
+    {
+        return (a < b) ? a : b;
+    }
+
+    ubint max(const ubint &a, const ubint &b)
+    {
+        return (a > b) ? a : b;
+    }
+
+    ubint factorial(const ubint &n)
+    {
+        if (n == 1)
+        {
+            return 1;
+        }
+
+        return n * factorial(n - 1);
+    }
+
+    ubint map(const ubint &x, const ubint &a, const ubint &b, const ubint &c, const ubint &d)
+    {
+        return (x - a) * (d - c) / (b - a) + c;
     }
 }
 
